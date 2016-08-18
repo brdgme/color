@@ -26,7 +26,7 @@ impl Color {
 
     pub fn hex(self) -> String {
         format!(
-            "{:x}{:x}{:x}",
+            "#{:x}{:x}{:x}",
             self.r,
             self.g,
             self.b,
@@ -197,4 +197,9 @@ pub fn player_colors() -> Vec<Color> {
         BROWN,
         BLUE_GREY,
     ]
+}
+
+pub fn player_color(player: usize) -> Color {
+    let pc = player_colors();
+    pc[player % pc.len()]
 }
