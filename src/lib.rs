@@ -1,4 +1,5 @@
 use std::fmt;
+use std::str::FromStr;
 
 #[derive(Clone, Copy)]
 pub struct Color {
@@ -31,6 +32,48 @@ impl Color {
             self.g,
             self.b,
         )
+    }
+
+    pub fn ansi_fg(self) -> String {
+        format!(
+            "\x1b[38;2;{};{};{}m",
+            self.r,
+            self.g,
+            self.b,
+        )
+    }
+
+    pub fn ansi_bg(self) -> String {
+        format!(
+            "\x1b[48;2;{};{};{}m",
+            self.r,
+            self.g,
+            self.b,
+        )
+    }
+
+    pub fn from_hex(s: &str) -> Result<Self, String> {
+        Err("not implemented".to_string())
+    }
+
+    pub fn from_rgb(s: &str) -> Result<Self, String> {
+        Err("not implemented".to_string())
+    }
+}
+
+impl FromStr for Color {
+    type Err = String;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if let Some(c) = named(s) {
+            return Ok(c);
+        }
+        if let Ok(c) = Color::from_hex(s) {
+            return Ok(c);
+        }
+        if let Ok(c) = Color::from_rgb(s) {
+            return Ok(c);
+        }
+        Err(format!(r##"could not find color "{}", please supply a known color name, a hex code in the format "#aabbcc" or RGB in the format "rgb(0,128,255)""##, s))
     }
 }
 
@@ -202,4 +245,31 @@ pub fn player_colors() -> Vec<Color> {
 pub fn player_color(player: usize) -> Color {
     let pc = player_colors();
     pc[player % pc.len()]
+}
+
+pub fn named(name: &str) -> Option<Color> {
+    match name {
+        "red" => Some(RED),
+        "pink" => Some(PINK),
+        "purple" => Some(PURPLE),
+        "deep_purple" => Some(DEEP_PURPLE),
+        "indigo" => Some(INDIGO),
+        "blue" => Some(BLUE),
+        "light_blue" => Some(LIGHT_BLUE),
+        "cyan" => Some(CYAN),
+        "teal" => Some(TEAL),
+        "green" => Some(GREEN),
+        "light_green" => Some(LIGHT_GREEN),
+        "lime" => Some(LIME),
+        "yellow" => Some(YELLOW),
+        "amber" => Some(AMBER),
+        "orange" => Some(ORANGE),
+        "deep_orange" => Some(DEEP_ORANGE),
+        "brown" => Some(BROWN),
+        "grey" => Some(GREY),
+        "blue_grey" => Some(BLUE_GREY),
+        "white" => Some(WHITE),
+        "black" => Some(BLACK),
+        _ => None,
+    }
 }
