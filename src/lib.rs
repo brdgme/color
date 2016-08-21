@@ -1,7 +1,12 @@
+#[macro_use]
+extern crate lazy_static;
+extern crate regex;
+
 use std::fmt;
 use std::str::FromStr;
+use regex::Regex;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 pub struct Color {
     pub r: u8,
     pub g: u8,
@@ -53,7 +58,17 @@ impl Color {
     }
 
     pub fn from_hex(s: &str) -> Result<Self, String> {
-        Err("not implemented".to_string())
+        lazy_static! {
+            static ref RE: Regex = Regex::new(r"^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$").unwrap();
+        }
+        for cap in RE.captures_iter(&s.to_lowercase()) {
+            return Ok(Color{
+                r: u8::from_str_radix(cap.at(1).unwrap(), 16).unwrap(),
+                g: u8::from_str_radix(cap.at(2).unwrap(), 16).unwrap(),
+                b: u8::from_str_radix(cap.at(3).unwrap(), 16).unwrap(),
+            });
+        }
+        return Err(format!(r##"expected input in the format of "#aabbcc", got "{}" "##, s));
     }
 
     pub fn from_rgb(s: &str) -> Result<Self, String> {
@@ -271,5 +286,15 @@ pub fn named(name: &str) -> Option<Color> {
         "white" => Some(WHITE),
         "black" => Some(BLACK),
         _ => None,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn color_from_hex_works() {
+        assert_eq!(Color::from_hex(&RED.hex()), Ok(RED));
     }
 }
