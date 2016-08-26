@@ -71,7 +71,7 @@ impl Color {
         return Err(format!(r##"expected input in the format of "#aabbcc", got "{}" "##, s));
     }
 
-    pub fn from_rgb(s: &str) -> Result<Self, String> {
+    pub fn from_rgb(_s: &str) -> Result<Self, String> {
         Err("not implemented".to_string())
     }
 }
