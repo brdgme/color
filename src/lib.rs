@@ -93,23 +93,23 @@ impl FromStr for Color {
 }
 
 #[derive(Clone, Copy)]
-pub struct Style {
-    pub fg: Color,
-    pub bg: Color,
+pub struct Style<'a> {
+    pub fg: &'a Color,
+    pub bg: &'a Color,
     pub bold: bool,
 }
 
-impl Default for Style {
-    fn default() -> Style {
+impl<'a> Default for Style<'a> {
+    fn default() -> Style<'a> {
         Style {
-            fg: BLACK,
-            bg: WHITE,
+            fg: &BLACK,
+            bg: &WHITE,
             bold: false,
         }
     }
 }
 
-impl Style {
+impl<'a> Style<'a> {
     pub fn ansi(self) -> String {
         format!(
             "\x1b[{b};38;2;{fgr};{fgg};{fgb};48;2;{bgr};{bgg};{bgb}m",
@@ -245,19 +245,19 @@ impl fmt::Display for Color {
     }
 }
 
-pub fn player_colors() -> Vec<Color> {
+pub fn player_colors<'a>() -> Vec<&'a Color> {
     vec![
-        GREEN,
-        RED,
-        BLUE,
-        AMBER,
-        PURPLE,
-        BROWN,
-        BLUE_GREY,
+        &GREEN,
+        &RED,
+        &BLUE,
+        &AMBER,
+        &PURPLE,
+        &BROWN,
+        &BLUE_GREY,
     ]
 }
 
-pub fn player_color(player: usize) -> Color {
+pub fn player_color<'a>(player: usize) -> &'a Color {
     let pc = player_colors();
     pc[player % pc.len()]
 }
