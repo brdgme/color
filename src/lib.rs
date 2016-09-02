@@ -68,7 +68,7 @@ impl Color {
                 b: u8::from_str_radix(cap.at(3).unwrap(), 16).unwrap(),
             });
         }
-        return Err(format!(r##"expected input in the format of "#aabbcc", got "{}" "##, s));
+        Err(format!(r##"expected input in the format of "#aabbcc", got "{}" "##, s))
     }
 
     pub fn from_rgb(_s: &str) -> Result<Self, String> {
