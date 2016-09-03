@@ -80,7 +80,7 @@ impl FromStr for Color {
     type Err = String;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if let Some(c) = named(s) {
-            return Ok(c);
+            return Ok(c.to_owned());
         }
         if let Ok(c) = Color::from_hex(s) {
             return Ok(c);
@@ -245,7 +245,7 @@ impl fmt::Display for Color {
     }
 }
 
-pub fn player_colors<'a>() -> Vec<&'a Color> {
+pub fn player_colors() -> Vec<&'static Color> {
     vec![
         &GREEN,
         &RED,
@@ -262,29 +262,29 @@ pub fn player_color<'a>(player: usize) -> &'a Color {
     pc[player % pc.len()]
 }
 
-pub fn named(name: &str) -> Option<Color> {
+pub fn named(name: &str) -> Option<&'static Color> {
     match name {
-        "red" => Some(RED),
-        "pink" => Some(PINK),
-        "purple" => Some(PURPLE),
-        "deep_purple" => Some(DEEP_PURPLE),
-        "indigo" => Some(INDIGO),
-        "blue" => Some(BLUE),
-        "light_blue" => Some(LIGHT_BLUE),
-        "cyan" => Some(CYAN),
-        "teal" => Some(TEAL),
-        "green" => Some(GREEN),
-        "light_green" => Some(LIGHT_GREEN),
-        "lime" => Some(LIME),
-        "yellow" => Some(YELLOW),
-        "amber" => Some(AMBER),
-        "orange" => Some(ORANGE),
-        "deep_orange" => Some(DEEP_ORANGE),
-        "brown" => Some(BROWN),
-        "grey" => Some(GREY),
-        "blue_grey" => Some(BLUE_GREY),
-        "white" => Some(WHITE),
-        "black" => Some(BLACK),
+        "red" => Some(&RED),
+        "pink" => Some(&PINK),
+        "purple" => Some(&PURPLE),
+        "deep_purple" => Some(&DEEP_PURPLE),
+        "indigo" => Some(&INDIGO),
+        "blue" => Some(&BLUE),
+        "light_blue" => Some(&LIGHT_BLUE),
+        "cyan" => Some(&CYAN),
+        "teal" => Some(&TEAL),
+        "green" => Some(&GREEN),
+        "light_green" => Some(&LIGHT_GREEN),
+        "lime" => Some(&LIME),
+        "yellow" => Some(&YELLOW),
+        "amber" => Some(&AMBER),
+        "orange" => Some(&ORANGE),
+        "deep_orange" => Some(&DEEP_ORANGE),
+        "brown" => Some(&BROWN),
+        "grey" => Some(&GREY),
+        "blue_grey" => Some(&BLUE_GREY),
+        "white" => Some(&WHITE),
+        "black" => Some(&BLACK),
         _ => None,
     }
 }
