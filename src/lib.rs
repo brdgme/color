@@ -59,16 +59,18 @@ impl Color {
 
     pub fn from_hex(s: &str) -> Result<Self, String> {
         lazy_static! {
-            static ref RE: Regex = Regex::new(r"^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$").unwrap();
+            static ref RE: Regex = Regex::new(
+                r"^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$").unwrap();
         }
         for cap in RE.captures_iter(&s.to_lowercase()) {
-            return Ok(Color{
+            return Ok(Color {
                 r: u8::from_str_radix(cap.at(1).unwrap(), 16).unwrap(),
                 g: u8::from_str_radix(cap.at(2).unwrap(), 16).unwrap(),
                 b: u8::from_str_radix(cap.at(3).unwrap(), 16).unwrap(),
             });
         }
-        Err(format!(r##"expected input in the format of "#aabbcc", got "{}" "##, s))
+        Err(format!(r##"expected input in the format of "#aabbcc", got "{}" "##,
+                    s))
     }
 
     pub fn from_rgb(_s: &str) -> Result<Self, String> {
@@ -88,7 +90,8 @@ impl FromStr for Color {
         if let Ok(c) = Color::from_rgb(s) {
             return Ok(c);
         }
-        Err(format!(r##"could not find color "{}", please supply a known color name, a hex code in the format "#aabbcc" or RGB in the format "rgb(0,128,255)""##, s))
+        Err(format!(
+            r##"could not find color "{}", please supply a known color name, a hex code in the format "#aabbcc" or RGB in the format "rgb(0,128,255)""##, s))
     }
 }
 
@@ -246,15 +249,7 @@ impl fmt::Display for Color {
 }
 
 pub fn player_colors() -> Vec<&'static Color> {
-    vec![
-        &GREEN,
-        &RED,
-        &BLUE,
-        &AMBER,
-        &PURPLE,
-        &BROWN,
-        &BLUE_GREY,
-    ]
+    vec![&GREEN, &RED, &BLUE, &AMBER, &PURPLE, &BROWN, &BLUE_GREY]
 }
 
 pub fn player_color<'a>(player: usize) -> &'a Color {
