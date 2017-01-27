@@ -4,5 +4,6 @@ version = "0.1.0"
 authors = ["Michael Alexander <beefsack@gmail.com>"]
 
 [dependencies]
-regex = "^0.1.73"
-lazy_static = "^0.2.1"
+brdgme-std = { path = "../std" }
+regex = "*"
+lazy_static = "*"
