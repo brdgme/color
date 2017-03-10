@@ -7,3 +7,5 @@ authors = ["Michael Alexander <beefsack@gmail.com>"]
 brdgme-std = { path = "../std" }
 regex = "*"
 lazy_static = "*"
+serde = "*"
+serde_derive = "*"

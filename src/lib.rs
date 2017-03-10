@@ -1,12 +1,15 @@
 #[macro_use]
 extern crate lazy_static;
+extern crate serde;
+#[macro_use]
+extern crate serde_derive;
 extern crate regex;
 
 use std::fmt;
 use std::str::FromStr;
 use regex::Regex;
 
-#[derive(Clone, Copy, PartialEq, Debug)]
+#[derive(Clone, Copy, PartialEq, Debug, Serialize, Deserialize)]
 pub struct Color {
     pub r: u8,
     pub g: u8,
@@ -64,10 +67,10 @@ impl Color {
         }
         for cap in RE.captures_iter(&s.to_lowercase()) {
             return Ok(Color {
-                r: u8::from_str_radix(&cap[1], 16).unwrap(),
-                g: u8::from_str_radix(&cap[2], 16).unwrap(),
-                b: u8::from_str_radix(&cap[3], 16).unwrap(),
-            });
+                          r: u8::from_str_radix(&cap[1], 16).unwrap(),
+                          g: u8::from_str_radix(&cap[2], 16).unwrap(),
+                          b: u8::from_str_radix(&cap[3], 16).unwrap(),
+                      });
         }
         Err(format!(r##"expected input in the format of "#aabbcc", got "{}" "##,
                     s))
