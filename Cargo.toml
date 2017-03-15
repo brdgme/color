@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = ["Michael Alexander <beefsack@gmail.com>"]
 
 [dependencies]
-brdgme-std = { path = "../std" }
+brdgme-std = { git = "https://github.com/brdgme/std.git" }
 regex = "*"
 lazy_static = "*"
 serde = "*"
