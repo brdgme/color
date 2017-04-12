@@ -4,10 +4,18 @@ extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 extern crate regex;
+#[macro_use]
+extern crate error_chain;
+
+mod errors {
+    error_chain!{}
+}
 
 use std::fmt;
 use std::str::FromStr;
 use regex::Regex;
+
+use errors::*;
 
 #[derive(Clone, Copy, PartialEq, Debug, Serialize, Deserialize)]
 pub struct Color {
@@ -35,7 +43,7 @@ impl Color {
 
     pub fn hex(self) -> String {
         format!(
-            "#{:x}{:x}{:x}",
+            "#{:02x}{:02x}{:02x}",
             self.r,
             self.g,
             self.b,
@@ -60,7 +68,7 @@ impl Color {
         )
     }
 
-    pub fn from_hex(s: &str) -> Result<Self, String> {
+    pub fn from_hex(s: &str) -> Result<Self> {
         lazy_static! {
             static ref RE: Regex = Regex::new(
                 r"^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$").unwrap();
@@ -72,18 +80,18 @@ impl Color {
                           b: u8::from_str_radix(&cap[3], 16).unwrap(),
                       });
         }
-        Err(format!(r##"expected input in the format of "#aabbcc", got "{}" "##,
-                    s))
+        bail!(r##"expected input in the format of "#aabbcc", got "{}" "##,
+              s);
     }
 
-    pub fn from_rgb(_s: &str) -> Result<Self, String> {
-        Err("not implemented".to_string())
+    pub fn from_rgb(_s: &str) -> Result<Self> {
+        unimplemented!()
     }
 }
 
 impl FromStr for Color {
-    type Err = String;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    type Err = Error;
+    fn from_str(s: &str) -> Result<Self> {
         if let Some(c) = named(s) {
             return Ok(c.to_owned());
         }
@@ -93,8 +101,8 @@ impl FromStr for Color {
         if let Ok(c) = Color::from_rgb(s) {
             return Ok(c);
         }
-        Err(format!(
-            r##"could not find color "{}", please supply a known color name, a hex code in the format "#aabbcc" or RGB in the format "rgb(0,128,255)""##, s))
+        bail!(
+            r##"could not find color "{}", please supply a known color name, a hex code in the format "#aabbcc" or RGB in the format "rgb(0,128,255)""##, s);
     }
 }
 
@@ -293,6 +301,6 @@ mod tests {
 
     #[test]
     fn color_from_hex_works() {
-        assert_eq!(Color::from_hex(&RED.hex()), Ok(RED));
+        assert_eq!(Color::from_hex(&RED.hex()).expect("error parsing hex"), RED);
     }
 }
