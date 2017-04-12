@@ -255,7 +255,7 @@ pub static BLACK: Color = Color { r: 0, g: 0, b: 0 };
 
 impl fmt::Display for Color {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "#{:x}{:x}{:x}", self.r, self.g, self.b)
+        write!(f, "#{:02x}{:02x}{:02x}", self.r, self.g, self.b)
     }
 }
 
