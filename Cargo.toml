@@ -6,6 +6,6 @@ authors = ["Michael Alexander <beefsack@gmail.com>"]
 [dependencies]
 regex = "0.2.1"
 lazy_static = "0.2.6"
-serde = "0.9.13"
-serde_derive = "0.9.13"
+serde = "1.0.0"
+serde_derive = "1.0.0"
 error-chain = "0.10.0"
