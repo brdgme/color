@@ -1,21 +1,18 @@
 #[macro_use]
+extern crate failure;
+#[macro_use]
 extern crate lazy_static;
+extern crate regex;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
-extern crate regex;
-#[macro_use]
-extern crate error_chain;
 
-mod errors {
-    error_chain!{}
-}
+mod error;
 
 use std::fmt;
 use std::str::FromStr;
 use regex::Regex;
-
-use errors::*;
+pub use error::ColorError;
 
 #[derive(Clone, Copy, PartialEq, Debug, Serialize, Deserialize)]
 pub struct Color {
@@ -42,56 +39,45 @@ impl Color {
     }
 
     pub fn hex(self) -> String {
-        format!(
-            "#{:02x}{:02x}{:02x}",
-            self.r,
-            self.g,
-            self.b,
-        )
+        format!("#{:02x}{:02x}{:02x}", self.r, self.g, self.b,)
     }
 
     pub fn ansi_fg(self) -> String {
-        format!(
-            "\x1b[38;2;{};{};{}m",
-            self.r,
-            self.g,
-            self.b,
-        )
+        format!("\x1b[38;2;{};{};{}m", self.r, self.g, self.b,)
     }
 
     pub fn ansi_bg(self) -> String {
-        format!(
-            "\x1b[48;2;{};{};{}m",
-            self.r,
-            self.g,
-            self.b,
-        )
+        format!("\x1b[48;2;{};{};{}m", self.r, self.g, self.b,)
     }
 
-    pub fn from_hex(s: &str) -> Result<Self> {
+    pub fn from_hex(s: &str) -> Result<Self, ColorError> {
         lazy_static! {
             static ref RE: Regex = Regex::new(
                 r"^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$").unwrap();
         }
-        for cap in RE.captures_iter(&s.to_lowercase()) {
+        if let Some(cap) = RE.captures_iter(&s.to_lowercase()).next() {
             return Ok(Color {
-                          r: u8::from_str_radix(&cap[1], 16).unwrap(),
-                          g: u8::from_str_radix(&cap[2], 16).unwrap(),
-                          b: u8::from_str_radix(&cap[3], 16).unwrap(),
-                      });
+                r: u8::from_str_radix(&cap[1], 16).unwrap(),
+                g: u8::from_str_radix(&cap[2], 16).unwrap(),
+                b: u8::from_str_radix(&cap[3], 16).unwrap(),
+            });
         }
-        bail!(r##"expected input in the format of "#aabbcc", got "{}" "##,
-              s);
+        Err(ColorError::Parse {
+            message: format!(
+                r##"expected input in the format of "#aabbcc", got "{}" "##,
+                s
+            ),
+        })
     }
 
-    pub fn from_rgb(_s: &str) -> Result<Self> {
+    pub fn from_rgb(_s: &str) -> Result<Self, ColorError> {
         unimplemented!()
     }
 }
 
 impl FromStr for Color {
-    type Err = Error;
-    fn from_str(s: &str) -> Result<Self> {
+    type Err = ColorError;
+    fn from_str(s: &str) -> Result<Self, ColorError> {
         if let Some(c) = named(s) {
             return Ok(c.to_owned());
         }
@@ -101,8 +87,12 @@ impl FromStr for Color {
         if let Ok(c) = Color::from_rgb(s) {
             return Ok(c);
         }
-        bail!(
-            r##"could not find color "{}", please supply a known color name, a hex code in the format "#aabbcc" or RGB in the format "rgb(0,128,255)""##, s);
+        Err(ColorError::Parse {
+            message: format!(
+                r##"could not find color "{}", please supply a known color name, a hex code in the format "#aabbcc" or RGB in the format "rgb(0,128,255)""##,
+                s
+            ),
+        })
     }
 }
 
@@ -140,11 +130,7 @@ impl<'a> Style<'a> {
     pub fn html_style(self) -> String {
         format!(
             "font-weight:{};color:{};background-color:{};",
-            if self.bold {
-                "bold"
-            } else {
-                "normal"
-            },
+            if self.bold { "bold" } else { "normal" },
             self.fg.hex(),
             self.bg.hex(),
         )
